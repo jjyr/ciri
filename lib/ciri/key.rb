@@ -43,7 +43,7 @@ module Ciri
     class << self
       def ecdsa_recover(msg, signature)
         raw_public_key = Crypto.ecdsa_recover(msg, signature, return_raw_key: true)
-        Ciri::Key.new(raw_public_key: raw_public_key)
+        from_pubkey(raw_public_key)
       end
 
       def random
@@ -53,16 +53,28 @@ module Ciri
           warn "generated privkey is not 32 bytes, bytes: #{raw_priv_key.size} privkey: #{Utils.to_hex raw_priv_key} -> regenerate it..."
           ec_key.generate_key
         end
-        Ciri::Key.new(ec_key: ec_key)
+        Ciri::Key.new(ec_key)
+      end
+
+      def from_privkey(privkey)
+        new(Ciri::Utils.create_ec_pk(raw_privkey: privkey))
+      end
+
+      def from_pubkey(pubkey)
+        # pubkey must be 65 size, with 0x04 as prefix
+        if pubkey.size == 64
+          pubkey = "\x04".b + pubkey
+        end
+        new(Ciri::Utils.create_ec_pk(raw_pubkey: pubkey))
       end
     end
 
+    attr_reader :ec_key
+
     # initialized from ec_key or raw keys
     # ec_key is a OpenSSL::PKey::EC object, raw keys is bytes presented keys
-    def initialize(ec_key: nil, raw_public_key: nil, raw_private_key: nil)
+    def initialize(ec_key)
       @ec_key = ec_key
-      @raw_public_key = raw_public_key
-      @raw_private_key = raw_private_key
     end
 
     # raw public key
@@ -84,17 +96,6 @@ module Ciri
 
     def to_address
       Types::Address.new(Utils.keccak(public_key)[-20..-1])
-    end
-
-    # regenerate ec_key from raw_public_key and raw_private_key
-    # can used to validate the public_key
-    def regenerate_ec_key
-      @ec_key = nil
-      ec_key
-    end
-
-    def ec_key
-      @ec_key ||= Ciri::Utils.create_ec_pk(raw_privkey: @raw_private_key, raw_pubkey: @raw_public_key)
     end
 
     private

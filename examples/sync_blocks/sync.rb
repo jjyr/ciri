@@ -35,11 +35,8 @@ def get_target_node
     puts "Usage: ruby examples/sync_blocks/sync.rb <node_id>"
     exit(1)
   end
-  id = ARGV[0]
-  raw_public_key = "\x04".b + [id].pack('H*')
-  node_id = Ciri::P2P::NodeID.new Ciri::Key.new(raw_public_key: raw_public_key)
-  address = Ciri::P2P::Address.new(ip: '127.0.0.1', udp_port: 30303, tcp_port: 30303)
-  Ciri::P2P::Node.new(node_id: node_id, addresses: [address])
+  enode = ARGV[0]
+  Ciri::P2P::Node.parse(enode)
 end
 
 # init genesis block

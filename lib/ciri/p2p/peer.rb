@@ -24,6 +24,7 @@
 
 require 'ciri/utils'
 require 'ciri/rlp'
+require_relative 'node'
 require_relative 'rlpx'
 require_relative 'protocol_io'
 

@@ -23,6 +23,7 @@
 
 require 'spec_helper'
 require 'async'
+require 'ciri/key'
 require 'ciri/p2p/errors'
 require 'ciri/p2p/network_state'
 require 'ciri/p2p/peer_store'
@@ -38,9 +39,9 @@ RSpec.describe Ciri::P2P::NetworkState do
     Ciri::P2P::RLPX::Cap.new(name: 'eth', version: 62),
     Ciri::P2P::RLPX::Cap.new(name: 'hello', version: 1),
   ]}
-  let(:handshake){Ciri::P2P::RLPX::ProtocolHandshake.new(version: 4, name: 'test', caps: caps, id: "\x00".b * 32)}
-  let(:handshake_only_hello){Ciri::P2P::RLPX::ProtocolHandshake.new(version: 4, name: 'test', caps: [Ciri::P2P::RLPX::Cap.new(name: 'hello', version: 1)], id: "\x01".b * 32)}
-  let(:handshake_only_hi){Ciri::P2P::RLPX::ProtocolHandshake.new(version: 4, name: 'test', caps: [Ciri::P2P::RLPX::Cap.new(name: 'hi', version: 1)], id: "\x01".b * 32)}
+  let(:handshake){Ciri::P2P::RLPX::ProtocolHandshake.new(version: 4, name: 'test', caps: caps, id: Ciri::Key::random.raw_public_key)}
+  let(:handshake_only_hello){Ciri::P2P::RLPX::ProtocolHandshake.new(version: 4, name: 'test', caps: [Ciri::P2P::RLPX::Cap.new(name: 'hello', version: 1)], id: Ciri::Key::random.raw_public_key)}
+  let(:handshake_only_hi){Ciri::P2P::RLPX::ProtocolHandshake.new(version: 4, name: 'test', caps: [Ciri::P2P::RLPX::Cap.new(name: 'hi', version: 1)], id: Ciri::Key::random.raw_public_key)}
   let(:protocols){[
     eth_protocol,
     old_eth_protocol,

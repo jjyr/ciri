@@ -74,7 +74,7 @@ module Ciri
         end
 
         def handle_auth_msg(msg)
-          @remote_key = Ciri::Key.new(raw_public_key: "\x04" + msg.initiator_pubkey)
+          @remote_key = Ciri::Key.from_pubkey(msg.initiator_pubkey)
           @initiator_nonce = msg.nonce
 
           token = dh_compute_key(private_key, @remote_key)
@@ -93,7 +93,7 @@ module Ciri
         def handle_auth_ack_msg(msg)
           # make nonce bytes
           @receiver_nonce = msg.nonce
-          @remote_random_key = Ciri::Key.new(raw_public_key: "\x04" + msg.random_pubkey)
+          @remote_random_key = Ciri::Key.from_pubkey(msg.random_pubkey)
         end
 
         def extract_secrets(auth_packet, auth_ack_packet, initiator:)

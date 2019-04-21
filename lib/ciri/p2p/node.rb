@@ -32,7 +32,7 @@ module Ciri
 
       class << self
         def from_raw_id(raw_id)
-          NodeID.new(Ciri::Key.new(raw_public_key: "\x04".b + raw_id))
+          NodeID.new(Ciri::Key.from_pubkey(raw_id))
         end
       end
 
@@ -76,6 +76,15 @@ module Ciri
         @node_id = node_id
         @addresses = addresses
         @added_at = added_at
+      end
+
+      def self.parse(enode_uri)
+        uri = URI.parse(enode_uri)
+        enode_id = uri.user
+        # decode enode from hex
+        raw_node_id = "\x04".b + [enode_id].pack('H*')
+        address = Ciri::P2P::Address.new(ip: uri.host, udp_port: uri.port, tcp_port: uri.port)
+        new(raw_node_id: raw_node_id, addresses: [address])
       end
 
       def == (other)

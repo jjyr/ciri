@@ -48,7 +48,7 @@ RSpec.describe Ciri::EVM do
   end
 
   def build_transaction(transaction_data, args)
-    key = Ciri::Key.new(raw_private_key: Ciri::Utils.to_bytes(transaction_data['secretKey']))
+    key = Ciri::Key.from_privkey(Ciri::Utils.to_bytes(transaction_data['secretKey']))
     transaction = Ciri::POWChain::Transaction.new(
         data: Ciri::Utils.to_bytes(transaction_data['data'][args['data']]),
         gas_limit: Ciri::Utils.hex_to_number(transaction_data['gasLimit'][args['gas']]),
